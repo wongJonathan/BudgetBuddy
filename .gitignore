@@ -108,15 +108,15 @@ venv.bak/
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+budgetbuddy/node_modules
+budgetbuddy/.pnp
 .pnp.js
 
 # testing
-/coverage
+budgetbuddy/coverage
 
 # production
-/build
+budgetbuddy/build
 
 # misc
 .DS_Store
@@ -128,3 +128,6 @@ venv.bak/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+budgetbuddy/.vscode
+.idea
