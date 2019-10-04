@@ -1,23 +1,17 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 
-interface IState {
+type IState = {
     amounts: string[],
     value: string
 };
 
-export default class Home extends React.Component<any, IState> {
+export default class Home extends React.Component<{}, IState> {
 
-    constructor(props: any) {
-        super(props);
-
-        this.state = {
-            amounts: [],
-            value: ''
-        };
-    }
+    state = {
+        amounts: [] as string[],
+        value: ''
+    };
 
     handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ value: e.target.value });
@@ -34,14 +28,21 @@ export default class Home extends React.Component<any, IState> {
     render() {
         console.log(this.state);
         return (
-            <TextField
-                id="moneyInput"
-                label="Enter Amount"
-                value={this.state.value}
-                variant="outlined"
-                onKeyDown={this.keyPress}
-                onChange={this.handleChange}
-            ></TextField>
+            <div>
+                <TextField
+                    id="moneyInput"
+                    label="Enter Amount"
+                    value={this.state.value}
+                    variant="outlined"
+                    onKeyDown={this.keyPress}
+                    onChange={this.handleChange}
+                ></TextField>
+                <div >
+                    {this.state.amounts.map(item => {
+                        return (<ul>{item}</ul>);
+                    })}
+                </div>
+            </div>
         );
     }
 };
