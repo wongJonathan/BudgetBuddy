@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import ExpenseForms from './components/expenses_page/expenseForm';
+import ExpensePage from './components/expenses_page/expensePage';
 
-ReactDOM.render(<ExpenseForms />, document.getElementById('root'));
+ReactDOM.render(<ExpensePage />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
