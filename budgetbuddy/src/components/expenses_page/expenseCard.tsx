@@ -4,12 +4,12 @@ import { Button, Input, Card, CardContent, CardActions, Divider } from "@materia
 import ExpenseInput from "./expenseInput";
 import { makeStyles } from "@material-ui/styles";
 import AddIcon from '@material-ui/icons/Add';
+import {PayPeriod} from '../../enum';
 
 interface ExpenseCardProps {
   tagName: string;
   expenses: ExpenseEntry[];
-  indexPosition: number;      // Used for calling parents callbacks.
-  handleChange: (change: HandleChange, indexPosition: number) => void;
+  handleChange: (change: HandleChange) => void;
 }
 
 const styles = makeStyles({
@@ -35,14 +35,22 @@ const styles = makeStyles({
   }
 });
 
-const ExpenseCard = ({tagName, expenses, indexPosition, handleChange}: ExpenseCardProps): ReactElement => {
-  const blankExpense = { expenseName: '', value: 0 }
+const ExpenseCard = ({tagName, expenses,  handleChange}: ExpenseCardProps): ReactElement => {
+  const blankExpense: ExpenseEntry = { expenseName: '', value: 0, payPeriodType: PayPeriod.Year }
+
   const [cardExpenses, setExpenses] = useState<ExpenseEntry[]>(expenses);
   const title = useRef('');
   const classes = styles();
 
   const addExpnese = () => {
-    setExpenses([...cardExpenses, { ...blankExpense }]);
+    // const blankExpense: ExpenseEntry = {};
+    // blankExpense.expenseName = '';
+    // blankExpense.value = 0;
+    // blankExpense.payPeriod = PayPeriod.Year;
+
+    setExpenses([...cardExpenses, blankExpense]);
+    if (cardExpenses.length >= 1)
+    console.log(cardExpenses[0].payPeriodType + '');
   }
 
   // Have it activate on clickaway
@@ -55,6 +63,8 @@ const ExpenseCard = ({tagName, expenses, indexPosition, handleChange}: ExpenseCa
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any, id: number) => {
     const updatedExpenses = [...cardExpenses];
     updatedExpenses[id][e.target.className] = e.target.value;
+    handleChange({ expenses: updatedExpenses });
+
     setExpenses(updatedExpenses);
   }
 
@@ -62,6 +72,7 @@ const ExpenseCard = ({tagName, expenses, indexPosition, handleChange}: ExpenseCa
     console.log(e.target.value);
     const updatedExpenses = [...cardExpenses];
     updatedExpenses[id]['payPeriodType'] = e.target.value;
+    handleChange({ expenses: updatedExpenses });
     setExpenses(updatedExpenses);
     console.log(cardExpenses);
   }  
@@ -76,7 +87,7 @@ const ExpenseCard = ({tagName, expenses, indexPosition, handleChange}: ExpenseCa
 
 
   const setTitle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    title.current = e.target.value;
+    handleChange({tagName: e.target.value});
   }
 
   return (

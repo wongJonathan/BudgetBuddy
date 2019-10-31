@@ -33,7 +33,7 @@ const addExpenses = (expenses: Expenses): number => {
 const ExpensePage = (): ReactElement => {
 
   const income = useRef(100000);
-  const [totalSpent, setTotalSpent] = useState(0);
+  // const [totalSpent, setTotalSpent] = useState(0);
   console.log('load');
   const basicExpenses: Expenses = {
     Year: {recurrence: 1, expenses: []},
@@ -46,11 +46,20 @@ const ExpensePage = (): ReactElement => {
   const allExpenses = useRef<Expenses>(basicExpenses);
   const [expenseTypes, setExpenseTypes] = useState<IExpenseCard[]>([]);
 
-  const handleSubmit = (expenses: ExpenseEntry[], type: string) => {
-    allExpenses.current[type]['expenses'] = expenses;
-
-    setTotalSpent(addExpenses(allExpenses.current));
-  }
+  const totalSpent = useMemo(() => {
+    let total = 0;
+    expenseTypes.forEach((expenseCard: IExpenseCard) => {
+      expenseCard.expenses.forEach((expense: ExpenseEntry) => {
+        // value comes out as a string for some reason
+        console.log(+expense.value);
+        console.log(expense );
+        console.log(expense.payPeriodType + '')
+        console.log(+expense.value * expense.payPeriodType);
+        total += +expense.value * expense.payPeriodType;
+      })
+    });
+    return total;
+  }, [expenseTypes]);
 
   const addCard = () => {
     let updatedExpenses = [...expenseTypes];
@@ -58,12 +67,20 @@ const ExpensePage = (): ReactElement => {
     setExpenseTypes(updatedExpenses);
   }
 
-  const handleCardChange = (change: HandleChange, indexPosition: number) => {
-    Object.keys(change).forEach((key: string) => {
-      expenseTypes[indexPosition][key] = change[key];
-    });
+  const handleCardChange = (indexPosition: number) => {
+    // Instead of passing the index position within the component pass it before and return 
+    // the callback function
+    return (change: HandleChange) => {
+      Object.keys(change).forEach((key: string) => {
+        expenseTypes[indexPosition][key] = change[key];
+      });
+
+      console.log(expenseTypes);
+      setExpenseTypes(expenseTypes);
+    }
   }
 
+  console.log(expenseTypes);
   return (
     <div>
       <div>
@@ -78,7 +95,7 @@ const ExpensePage = (): ReactElement => {
       <div>
         {
           expenseTypes.map((type: IExpenseCard, index: number) => {
-            return <ExpenseCard indexPosition={index} tagName={type.tagName} expenses={type.expenses} handleChange={handleCardChange} />;
+            return <ExpenseCard tagName={type.tagName} expenses={type.expenses} handleChange={handleCardChange(index)} />;
           })
         }
       </div>
