@@ -1,9 +1,16 @@
 import React, { ReactElement, useState, useRef } from "react";
-import { ExpenseEntry } from "../../types";
+import { ExpenseEntry, HandleChange } from "../../types";
 import { Button, Input, Card, CardContent, CardActions, Divider } from "@material-ui/core";
 import ExpenseInput from "./expenseInput";
 import { makeStyles } from "@material-ui/styles";
 import AddIcon from '@material-ui/icons/Add';
+
+interface ExpenseCardProps {
+  tagName: string;
+  expenses: ExpenseEntry[];
+  indexPosition: number;      // Used for calling parents callbacks.
+  handleChange: (change: HandleChange, indexPosition: number) => void;
+}
 
 const styles = makeStyles({
   root: {
@@ -28,14 +35,14 @@ const styles = makeStyles({
   }
 });
 
-const ExpenseCard = (): ReactElement => {
+const ExpenseCard = ({tagName, expenses, indexPosition, handleChange}: ExpenseCardProps): ReactElement => {
   const blankExpense = { expenseName: '', value: 0 }
-  const [expenses, setExpenses] = useState<ExpenseEntry[]>([]);
+  const [cardExpenses, setExpenses] = useState<ExpenseEntry[]>(expenses);
   const title = useRef('');
   const classes = styles();
 
   const addExpnese = () => {
-    setExpenses([...expenses, { ...blankExpense }]);
+    setExpenses([...cardExpenses, { ...blankExpense }]);
   }
 
   // Have it activate on clickaway
@@ -46,17 +53,17 @@ const ExpenseCard = (): ReactElement => {
   // }
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any, id: number) => {
-    const updatedExpenses = [...expenses];
+    const updatedExpenses = [...cardExpenses];
     updatedExpenses[id][e.target.className] = e.target.value;
     setExpenses(updatedExpenses);
   }
 
   const onChangeSelect = (e: any, id: number) => {
     console.log(e.target.value);
-    const updatedExpenses = [...expenses];
+    const updatedExpenses = [...cardExpenses];
     updatedExpenses[id]['payPeriodType'] = e.target.value;
     setExpenses(updatedExpenses);
-    console.log(expenses);
+    console.log(cardExpenses);
   }  
   
   // @todo: Removing without submitting updates the total spent. Can submit empty labels
@@ -65,7 +72,7 @@ const ExpenseCard = (): ReactElement => {
   //   updatedExpenses.splice(index, 1);
   //   setExpenses(updatedExpenses);
   //   handleSubmit(updatedExpenses, type);
-  // }
+  // }dfsd
 
 
   const setTitle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -81,7 +88,7 @@ const ExpenseCard = (): ReactElement => {
         <Divider />
         <CardContent>
           <div>
-            {expenses.map((expense, index) =>
+            {cardExpenses.map((expense, index) =>
               <ExpenseInput
                 key={index}
                 expense={expense}

@@ -1,14 +1,21 @@
 import React, { ReactElement, useRef, useState, useCallback, useMemo } from "react";
-import { ExpenseEntry } from '../../types';
+import { ExpenseEntry, HandleChange } from '../../types';
 import ExpenseForm from './expenseForm';
 import ExpenseCard from './expenseCard';
-import { Typography } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 
 interface Expenses {
   [type: string]: {
     recurrence: number;
     expenses: ExpenseEntry[];
   }
+}
+
+interface IExpenseCard {
+  tagName: string;
+  expenses: ExpenseEntry[];
+  [key: string]: string | ExpenseEntry[];
+
 }
 
 //@todo: Figure out how to update toatl spent when deleting button
@@ -37,11 +44,24 @@ const ExpensePage = (): ReactElement => {
   };
 
   const allExpenses = useRef<Expenses>(basicExpenses);
+  const [expenseTypes, setExpenseTypes] = useState<IExpenseCard[]>([]);
 
   const handleSubmit = (expenses: ExpenseEntry[], type: string) => {
     allExpenses.current[type]['expenses'] = expenses;
 
     setTotalSpent(addExpenses(allExpenses.current));
+  }
+
+  const addCard = () => {
+    let updatedExpenses = [...expenseTypes];
+    updatedExpenses.push({tagName: '', expenses: []});
+    setExpenseTypes(updatedExpenses);
+  }
+
+  const handleCardChange = (change: HandleChange, indexPosition: number) => {
+    Object.keys(change).forEach((key: string) => {
+      expenseTypes[indexPosition][key] = change[key];
+    });
   }
 
   return (
@@ -54,7 +74,14 @@ const ExpensePage = (): ReactElement => {
       {/* {Reflect.ownKeys(allExpenses.current).map(type => {
         return <ExpenseForm type={type as string} handleSubmit={handleSubmit} />
       })} */}
-      <ExpenseCard />
+      <Button onClick={addCard} > Add Expense Type </Button>
+      <div>
+        {
+          expenseTypes.map((type: IExpenseCard, index: number) => {
+            return <ExpenseCard indexPosition={index} tagName={type.tagName} expenses={type.expenses} handleChange={handleCardChange} />;
+          })
+        }
+      </div>
     </div>
   )
 }

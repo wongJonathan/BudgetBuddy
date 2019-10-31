@@ -5,3 +5,6 @@ export interface ExpenseEntry {
   [key: string]: string | number | PayPeriod;
 }
 
+export interface HandleChange {
+  [type: string]: string | number | PayPeriod | ExpenseEntry | ExpenseEntry[];
+}
