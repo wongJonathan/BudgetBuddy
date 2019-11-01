@@ -1,6 +1,5 @@
 import React, { ReactElement, useRef, useState, useCallback, useMemo } from "react";
 import { ExpenseEntry, HandleChange } from '../../types';
-import ExpenseForm from './expenseForm';
 import ExpenseCard from './expenseCard';
 import { Button, Typography } from "@material-ui/core";
 
@@ -14,56 +13,27 @@ interface Expenses {
 interface IExpenseCard {
   tagName: string;
   expenses: ExpenseEntry[];
-  [key: string]: string | ExpenseEntry[];
+  total: number;
+  [key: string]: string | ExpenseEntry[] | number;
 
-}
-
-//@todo: Figure out how to update toatl spent when deleting button
-
-const addExpenses = (expenses: Expenses): number => {
-  return Reflect.ownKeys(expenses)
-    .reduce((total: number, type: string | number | symbol) => {
-      const expenseType = type as string;
-      console.log(expenseType);
-      return total + expenses[expenseType]['recurrence'] * expenses[expenseType]['expenses']
-        .reduce((acc: number, expense: ExpenseEntry) => +expense.value + acc, 0);
-    }, 0);
 }
 
 const ExpensePage = (): ReactElement => {
 
   const income = useRef(100000);
-  // const [totalSpent, setTotalSpent] = useState(0);
-  console.log('load');
-  const basicExpenses: Expenses = {
-    Year: {recurrence: 1, expenses: []},
-    Monthly: {recurrence: 12, expenses: []},
-    Weekly: {recurrence: 52, expenses: []},
-    // @todo: should consider how to handle leap years
-    Daily: { recurrence: 365, expenses: []},
-  };
-
-  const allExpenses = useRef<Expenses>(basicExpenses);
   const [expenseTypes, setExpenseTypes] = useState<IExpenseCard[]>([]);
 
   const totalSpent = useMemo(() => {
     let total = 0;
     expenseTypes.forEach((expenseCard: IExpenseCard) => {
-      expenseCard.expenses.forEach((expense: ExpenseEntry) => {
-        // value comes out as a string for some reason
-        console.log(+expense.value);
-        console.log(expense );
-        console.log(expense.payPeriodType + '')
-        console.log(+expense.value * expense.payPeriodType);
-        total += +expense.value * expense.payPeriodType;
-      })
+      total += expenseCard.total;
     });
     return total;
   }, [expenseTypes]);
 
   const addCard = () => {
     let updatedExpenses = [...expenseTypes];
-    updatedExpenses.push({tagName: '', expenses: []});
+    updatedExpenses.push({tagName: '', expenses: [], total: 0});
     setExpenseTypes(updatedExpenses);
   }
 
@@ -71,12 +41,13 @@ const ExpensePage = (): ReactElement => {
     // Instead of passing the index position within the component pass it before and return 
     // the callback function
     return (change: HandleChange) => {
+      let updatedExpenses = [...expenseTypes];
       Object.keys(change).forEach((key: string) => {
-        expenseTypes[indexPosition][key] = change[key];
+        updatedExpenses[indexPosition][key] = change[key];
       });
 
       console.log(expenseTypes);
-      setExpenseTypes(expenseTypes);
+      setExpenseTypes(updatedExpenses);
     }
   }
 
@@ -88,14 +59,11 @@ const ExpensePage = (): ReactElement => {
         <Typography variant="h6">{`Total spent: ${totalSpent}`}</Typography>
         <Typography variant="h6">{`Left over: ${income.current - totalSpent}`}</Typography>
       </div>
-      {/* {Reflect.ownKeys(allExpenses.current).map(type => {
-        return <ExpenseForm type={type as string} handleSubmit={handleSubmit} />
-      })} */}
       <Button onClick={addCard} > Add Expense Type </Button>
       <div>
         {
           expenseTypes.map((type: IExpenseCard, index: number) => {
-            return <ExpenseCard tagName={type.tagName} expenses={type.expenses} handleChange={handleCardChange(index)} />;
+            return <ExpenseCard total={type.total} tagName={type.tagName} expenses={type.expenses} handleChange={handleCardChange(index)} />;
           })
         }
       </div>

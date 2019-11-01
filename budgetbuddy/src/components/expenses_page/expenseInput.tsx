@@ -6,15 +6,14 @@ import {PayPeriod} from '../../enum';
 
 interface ExpenseInput {
   expense: ExpenseEntry;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>, index: number) => void;
+  onChange: (event: React.FormEvent<HTMLInputElement> ) => void;
   onRemove: (idx: number) => void;
-  index: number;
-  onChangeSelect?: (e: any, id: number) => void;
+  onChangeSelect?: (e: any) => void;
 }
 
 
 
-const ExpenseInput = ({ expense, onChange, onRemove, index, onChangeSelect }: ExpenseInput): ReactElement => {
+const ExpenseInput = ({ expense, onChange, onRemove, onChangeSelect }: ExpenseInput): ReactElement => {
 
   const selector = (): ReactElement => {
     // Gets the keys of all the PayPeriod enum
@@ -25,7 +24,7 @@ const ExpenseInput = ({ expense, onChange, onRemove, index, onChangeSelect }: Ex
     return (
       <Select 
         value={selectValue} 
-        onChange={e => (onChangeSelect !== undefined) ? onChangeSelect(e as any, index) : null } 
+        onChange={e => (onChangeSelect !== undefined) ? onChangeSelect(e as any) : null } 
         className="payPeriodType"
       >
         {payPeriods.map(payPeriodValue => {
@@ -49,7 +48,7 @@ const ExpenseInput = ({ expense, onChange, onRemove, index, onChangeSelect }: Ex
         type="text"
         name="expenseName"
         className="expenseName"
-        onChange={e => onChange(e, index)}
+        onChange={onChange}
         value={expense.expenseName}
         placeholder="Enter expense label"
         required />
@@ -58,11 +57,11 @@ const ExpenseInput = ({ expense, onChange, onRemove, index, onChangeSelect }: Ex
         type="number"
         name="value"
         className="value"
-        onChange={e => onChange(e, index)}
+        onChange={onChange}
         value={expense.value}
         required />
       {onChangeSelect !== undefined && selector()}
-      <IconButton onClick={() => onRemove(index)}>
+      <IconButton>
         <CloseIcon />
       </IconButton>
     </div>

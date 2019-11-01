@@ -7,6 +7,7 @@ import AddIcon from '@material-ui/icons/Add';
 import {PayPeriod} from '../../enum';
 
 interface ExpenseCardProps {
+  total: number;
   tagName: string;
   expenses: ExpenseEntry[];
   handleChange: (change: HandleChange) => void;
@@ -35,7 +36,7 @@ const styles = makeStyles({
   }
 });
 
-const ExpenseCard = ({tagName, expenses,  handleChange}: ExpenseCardProps): ReactElement => {
+const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps): ReactElement => {
   const blankExpense: ExpenseEntry = { expenseName: '', value: 0, payPeriodType: PayPeriod.Year }
 
   const [cardExpenses, setExpenses] = useState<ExpenseEntry[]>(expenses);
@@ -60,22 +61,30 @@ const ExpenseCard = ({tagName, expenses,  handleChange}: ExpenseCardProps): Reac
   //   handleSubmit(expenses, type);
   // }
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any, id: number) => {
-    const updatedExpenses = [...cardExpenses];
-    updatedExpenses[id][e.target.className] = e.target.value;
-    handleChange({ expenses: updatedExpenses });
+  const onChange = (id: number) => {
+    return (e: React.FormEvent<HTMLInputElement> ) => {
+      const updatedExpenses = [...cardExpenses];
+      if (e.currentTarget.className === 'value') {
+        updatedExpenses[id][e.currentTarget.className] = +e.currentTarget.value;
+      } else {
+        updatedExpenses[id][e.currentTarget.className] = e.currentTarget.value;
+      }
+      handleChange({ expenses: updatedExpenses });
 
-    setExpenses(updatedExpenses);
+      setExpenses(updatedExpenses);
+    }
   }
 
-  const onChangeSelect = (e: any, id: number) => {
-    console.log(e.target.value);
-    const updatedExpenses = [...cardExpenses];
-    updatedExpenses[id]['payPeriodType'] = e.target.value;
-    handleChange({ expenses: updatedExpenses });
-    setExpenses(updatedExpenses);
-    console.log(cardExpenses);
-  }  
+  const onChangeSelect = (id: number) => (
+    (e: any) => {
+      console.log(e.target.value);
+      const updatedExpenses = [...cardExpenses];
+      updatedExpenses[id]['payPeriodType'] = e.target.value;
+      handleChange({ expenses: updatedExpenses });
+      setExpenses(updatedExpenses);
+      console.log(cardExpenses);
+    }
+  );
   
   // @todo: Removing without submitting updates the total spent. Can submit empty labels
   // const onRemove = (index: number) => {
@@ -103,10 +112,9 @@ const ExpenseCard = ({tagName, expenses,  handleChange}: ExpenseCardProps): Reac
               <ExpenseInput
                 key={index}
                 expense={expense}
-                onChange={onChange}
-                index={index}
+                onChange={onChange(index)}
                 onRemove={() => { }}
-                onChangeSelect={onChangeSelect}
+                onChangeSelect={onChangeSelect(index)}
               />)}
           </div>
         </CardContent>
