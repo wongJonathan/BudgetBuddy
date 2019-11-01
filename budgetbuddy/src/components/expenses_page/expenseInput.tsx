@@ -1,14 +1,15 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useState, ChangeEvent } from "react";
 import { IconButton, Select, MenuItem } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close"
-import { ExpenseEntry } from '../../types';
+import { ExpenseEntry, ISelectOnChagne } from '../../types';
 import {PayPeriod} from '../../enum';
 
 interface ExpenseInput {
   expense: ExpenseEntry;
   onChange: (event: React.FormEvent<HTMLInputElement> ) => void;
   onRemove: (idx: number) => void;
-  onChangeSelect?: (e: any) => void;
+  // OnChangeSelect is set to any since typescript cant figure out MUI's select
+  onChangeSelect?: (event: any, child?: object) => void;
 }
 
 
@@ -24,7 +25,7 @@ const ExpenseInput = ({ expense, onChange, onRemove, onChangeSelect }: ExpenseIn
     return (
       <Select 
         value={selectValue} 
-        onChange={e => (onChangeSelect !== undefined) ? onChangeSelect(e as any) : null } 
+        onChange={e => (onChangeSelect !== undefined) ? onChangeSelect(e) : null } 
         className="payPeriodType"
       >
         {payPeriods.map(payPeriodValue => {

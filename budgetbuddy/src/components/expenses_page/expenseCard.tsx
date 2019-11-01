@@ -1,5 +1,5 @@
 import React, { ReactElement, useState, useRef } from "react";
-import { ExpenseEntry, HandleChange } from "../../types";
+import { ExpenseEntry, HandleChange, ISelectOnChagne } from "../../types";
 import { Button, Input, Card, CardContent, CardActions, Divider } from "@material-ui/core";
 import ExpenseInput from "./expenseInput";
 import { makeStyles } from "@material-ui/styles";
@@ -76,10 +76,9 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
   }
 
   const onChangeSelect = (id: number) => (
-    (e: any) => {
-      console.log(e.target.value);
+    (event: any, child?: object) => {
       const updatedExpenses = [...cardExpenses];
-      updatedExpenses[id]['payPeriodType'] = e.target.value;
+      updatedExpenses[id].payPeriodType = event.target.value;
       handleChange({ expenses: updatedExpenses });
       setExpenses(updatedExpenses);
       console.log(cardExpenses);
