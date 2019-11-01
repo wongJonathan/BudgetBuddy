@@ -7,7 +7,7 @@ import {PayPeriod} from '../../enum';
 interface ExpenseInput {
   expense: ExpenseEntry;
   onChange: (event: React.FormEvent<HTMLInputElement> ) => void;
-  onRemove: (idx: number) => void;
+  onRemove: () => void;
   // OnChangeSelect is set to any since typescript cant figure out MUI's select
   onChangeSelect?: (event: any, child?: object) => void;
 }
@@ -62,7 +62,7 @@ const ExpenseInput = ({ expense, onChange, onRemove, onChangeSelect }: ExpenseIn
         value={expense.value}
         required />
       {onChangeSelect !== undefined && selector()}
-      <IconButton>
+      <IconButton onClick={onRemove}>
         <CloseIcon />
       </IconButton>
     </div>
