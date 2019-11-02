@@ -59,7 +59,7 @@ const ExpenseInput = ({ expense, onChange, onRemove, onChangeSelect }: ExpenseIn
         name="value"
         className="value"
         onChange={onChange}
-        value={expense.value}
+        value={expense.value === 0? '':expense.value}
         required />
       {onChangeSelect !== undefined && selector()}
       <IconButton onClick={onRemove}>
