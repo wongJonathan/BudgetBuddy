@@ -37,6 +37,7 @@ const styles = makeStyles({
 });
 
 const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps): ReactElement => {
+  // Cant get rid of 0
   const blankExpense: ExpenseEntry = { expenseName: '', value: 0, payPeriodType: PayPeriod.Year }
 
   const [cardExpenses, setExpenses] = useState<ExpenseEntry[]>(expenses);
@@ -52,24 +53,14 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
   }
 
 
-  // const changeEvent = (id: number, type: string) => {
-  //   const updatedExpenses = [...cardExpenses];
-
-  //   switch(type) {
-  //     case 'input':
-  //       break;
-  //     case 'select':
-  //       break;
-  //     case 'remove':
-  //       break;
-  //   }
-  // };
-
   const onChange = (id: number) => {
     return (e: React.FormEvent<HTMLInputElement> ) => {
       const updatedExpenses = [...cardExpenses];
       if (e.currentTarget.className === 'value') {
-        updatedExpenses[id][e.currentTarget.className] = +e.currentTarget.value;
+        const newValue: number = +e.currentTarget.value;
+
+        updateTotal(id, 'value', newValue);
+        updatedExpenses[id].value = newValue;
       } else {
         updatedExpenses[id][e.currentTarget.className] = e.currentTarget.value;
       }
@@ -81,7 +72,10 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
   const onChangeSelect = (id: number) => (
     (event: any, child?: object) => {
       const updatedExpenses = [...cardExpenses];
-      updatedExpenses[id].payPeriodType = event.target.value;
+      const newValue: number = event.target.value;
+
+      updateTotal(id, 'payPeriodType', newValue);
+      updatedExpenses[id].payPeriodType = newValue;
       handleChange({ expenses: updatedExpenses });
       setExpenses(updatedExpenses);
       console.log(cardExpenses);
@@ -91,17 +85,35 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
   const onRemove = (index: number) => (
     () => {
       const updatedExpenses = [...expenses];
+
+      updateTotal(index, 'remove');
       updatedExpenses.splice(index, 1);
       handleChange({ expenses: updatedExpenses });
       setExpenses(updatedExpenses);
     }
   );
 
+  const updateTotal = (id: number, type: string, newValue: number = 0 ) => {
+    let diff = 0;
+
+    switch(type) {
+      case 'value':
+        diff = cardExpenses[id].payPeriodType * (newValue - cardExpenses[id].value);
+        break;
+      case 'payPeriodType':
+        diff = cardExpenses[id].value * (newValue - cardExpenses[id].payPeriodType);
+        break;
+      case 'remove':
+        diff = -cardExpenses[id].value * cardExpenses[id].payPeriodType;
+        break;
+    }
+    handleChange({ total: totalExpense + diff });
+    setTotalExpense(totalExpense + diff);
+  }
+
   const setTitle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     handleChange({tagName: e.target.value});
   }
-
- // Might calculate total in each section first
 
   return (
     <div className={classes.root}>
