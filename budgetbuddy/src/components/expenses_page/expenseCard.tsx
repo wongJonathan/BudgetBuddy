@@ -1,15 +1,16 @@
 import React, { ReactElement, useState, useRef } from "react";
-import { ExpenseEntry, HandleChange } from "../../types";
-import { Button, Input, Card, CardContent, CardActions, Divider } from "@material-ui/core";
+import { ExpenseEntry, HandleChange, ISelectOnChagne } from "../../types";
+import { Button, Input, Card, CardContent, CardActions, Divider, Typography } from "@material-ui/core";
 import ExpenseInput from "./expenseInput";
 import { makeStyles } from "@material-ui/styles";
 import AddIcon from '@material-ui/icons/Add';
+import {PayPeriod} from '../../enum';
 
 interface ExpenseCardProps {
+  total: number;
   tagName: string;
   expenses: ExpenseEntry[];
-  indexPosition: number;      // Used for calling parents callbacks.
-  handleChange: (change: HandleChange, indexPosition: number) => void;
+  handleChange: (change: HandleChange) => void;
 }
 
 const styles = makeStyles({
@@ -35,48 +36,83 @@ const styles = makeStyles({
   }
 });
 
-const ExpenseCard = ({tagName, expenses, indexPosition, handleChange}: ExpenseCardProps): ReactElement => {
-  const blankExpense = { expenseName: '', value: 0 }
+const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps): ReactElement => {
+  // Cant get rid of 0
+  const blankExpense: ExpenseEntry = { expenseName: '', value: 0, payPeriodType: PayPeriod.Year }
+
   const [cardExpenses, setExpenses] = useState<ExpenseEntry[]>(expenses);
+  const [totalExpense, setTotalExpense] = useState<number>(total);
   const title = useRef('');
   const classes = styles();
 
-  const addExpnese = () => {
-    setExpenses([...cardExpenses, { ...blankExpense }]);
-  }
+  const addExpense = () => {
+    const updatedExpenses = [...cardExpenses, blankExpense];
+    handleChange({ expenses: updatedExpenses });
 
-  // Have it activate on clickaway
-  // const onSubmit = (event: any) => {
-  //   event.preventDefault();
-  //   console.log(expenses);
-  //   handleSubmit(expenses, type);
-  // }
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any, id: number) => {
-    const updatedExpenses = [...cardExpenses];
-    updatedExpenses[id][e.target.className] = e.target.value;
     setExpenses(updatedExpenses);
   }
 
-  const onChangeSelect = (e: any, id: number) => {
-    console.log(e.target.value);
-    const updatedExpenses = [...cardExpenses];
-    updatedExpenses[id]['payPeriodType'] = e.target.value;
-    setExpenses(updatedExpenses);
-    console.log(cardExpenses);
-  }  
+
+  const onChange = (id: number) => {
+    return (e: React.FormEvent<HTMLInputElement> ) => {
+      const updatedExpenses = [...cardExpenses];
+      if (e.currentTarget.className === 'value') {
+        const newValue: number = +e.currentTarget.value;
+
+        updateTotal(id, 'value', newValue);
+        updatedExpenses[id].value = newValue;
+      } else {
+        updatedExpenses[id][e.currentTarget.className] = e.currentTarget.value;
+      }
+      handleChange({ expenses: updatedExpenses });
+      setExpenses(updatedExpenses);
+    }
+  }
+
+  const onChangeSelect = (id: number) => (
+    (event: any, child?: object) => {
+      const updatedExpenses = [...cardExpenses];
+      const newValue: number = event.target.value;
+
+      updateTotal(id, 'payPeriodType', newValue);
+      updatedExpenses[id].payPeriodType = newValue;
+      handleChange({ expenses: updatedExpenses });
+      setExpenses(updatedExpenses);
+      console.log(cardExpenses);
+    }
+  );
   
-  // @todo: Removing without submitting updates the total spent. Can submit empty labels
-  // const onRemove = (index: number) => {
-  //   const updatedExpenses = [...expenses];
-  //   updatedExpenses.splice(index, 1);
-  //   setExpenses(updatedExpenses);
-  //   handleSubmit(updatedExpenses, type);
-  // }dfsd
+  const onRemove = (index: number) => (
+    () => {
+      const updatedExpenses = [...expenses];
 
+      updateTotal(index, 'remove');
+      updatedExpenses.splice(index, 1);
+      handleChange({ expenses: updatedExpenses });
+      setExpenses(updatedExpenses);
+    }
+  );
+
+  const updateTotal = (id: number, type: string, newValue: number = 0 ) => {
+    let diff = 0;
+
+    switch(type) {
+      case 'value':
+        diff = cardExpenses[id].payPeriodType * (newValue - cardExpenses[id].value);
+        break;
+      case 'payPeriodType':
+        diff = cardExpenses[id].value * (newValue - cardExpenses[id].payPeriodType);
+        break;
+      case 'remove':
+        diff = -cardExpenses[id].value * cardExpenses[id].payPeriodType;
+        break;
+    }
+    handleChange({ total: totalExpense + diff });
+    setTotalExpense(totalExpense + diff);
+  }
 
   const setTitle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    title.current = e.target.value;
+    handleChange({tagName: e.target.value});
   }
 
   return (
@@ -88,20 +124,20 @@ const ExpenseCard = ({tagName, expenses, indexPosition, handleChange}: ExpenseCa
         <Divider />
         <CardContent>
           <div>
+            <Typography> {`Total: ${totalExpense}`} </Typography>
             {cardExpenses.map((expense, index) =>
               <ExpenseInput
                 key={index}
                 expense={expense}
-                onChange={onChange}
-                index={index}
-                onRemove={() => { }}
-                onChangeSelect={onChangeSelect}
+                onChange={onChange(index)}
+                onRemove={onRemove(index)}
+                onChangeSelect={onChangeSelect(index)}
               />)}
           </div>
         </CardContent>
         <Divider />
         <CardActions className={classes.cardActionButton}>
-          <Button className={classes.addExpenseButton} onClick={addExpnese}><AddIcon /></Button>
+          <Button className={classes.addExpenseButton} onClick={addExpense}><AddIcon /></Button>
         </CardActions>
       </Card>
     </div>
