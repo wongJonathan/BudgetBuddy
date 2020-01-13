@@ -1,4 +1,5 @@
 export interface ExpenseEntry {
+  tagName: string;
   expenseName: string;
   value: number;
   payPeriodType?: PayPeriod;

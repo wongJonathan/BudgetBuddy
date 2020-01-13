@@ -16,7 +16,6 @@ interface ExpenseCardProps {
 const styles = makeStyles({
   root: {
     maxWidth: '700px',
-    // display: 'z',
     padding: '10px'
   },
   card: {
@@ -38,7 +37,7 @@ const styles = makeStyles({
 
 const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps): ReactElement => {
   // Cant get rid of 0
-  const blankExpense: ExpenseEntry = { expenseName: '', value: 0, payPeriodType: PayPeriod.Year }
+  const blankExpense: ExpenseEntry = { tagName: tagName, expenseName: '', value: 0, payPeriodType: PayPeriod.Year }
 
   const [cardExpenses, setExpenses] = useState<ExpenseEntry[]>(expenses);
   const [totalExpense, setTotalExpense] = useState<number>(total);
@@ -120,28 +119,13 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
     <div className={classes.root}>
       <Card className={classes.card}>
         <CardContent>
-          <Input
-              className={classes.titleDiv}
-              placeholder="Enter Name of Type"
-              onChange={setCardTitle} disableUnderline
-              value={title}
-          />
+          <Typography variant="h5">
+            {title}
+          </Typography>
+          <Typography color="textSecondary">
+            {`$${total}`}
+          </Typography>
         </CardContent>
-        <Divider />
-        <CardContent>
-          <div>
-            <Typography> {`Total: ${totalExpense}`} </Typography>
-            {cardExpenses.map((expense, index) =>
-              <ExpenseInput
-                key={index}
-                expense={expense}
-                onChange={onChange(index)}
-                onRemove={onRemove(index)}
-                onChangeSelect={onChangeSelect(index)}
-              />)}
-          </div>
-        </CardContent>
-        <Divider />
         <CardActions className={classes.cardActionButton}>
           <Button className={classes.addExpenseButton} onClick={addExpense}><AddIcon /></Button>
         </CardActions>
