@@ -1,7 +1,7 @@
 import React, { ReactElement, useState, ChangeEvent } from "react";
 import { IconButton, Select, MenuItem } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close"
-import { ExpenseEntry, ISelectOnChagne } from '../../types';
+import { ExpenseEntry, ISelectOnChange } from '../../types';
 import {PayPeriod} from '../../enum';
 
 interface ExpenseInput {

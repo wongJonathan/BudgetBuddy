@@ -1,7 +1,9 @@
-import React, { ReactElement, useRef, useState, useCallback, useMemo } from "react";
+import React, {ReactElement, useRef, useState, useCallback, useMemo, useEffect} from "react";
+import { Button, Typography } from "@material-ui/core";
+import axios from 'axios';
+
 import { ExpenseEntry, HandleChange } from '../../types';
 import ExpenseCard from './expenseCard';
-import { Button, Typography } from "@material-ui/core";
 
 interface Expenses {
   [type: string]: {
@@ -15,8 +17,12 @@ interface IExpenseCard {
   expenses: ExpenseEntry[];
   total: number;
   [key: string]: string | ExpenseEntry[] | number;
-
 }
+
+const getExpenseData = (): Promise<ExpenseEntry[]> => {
+  return axios.get('http://localhost:8000/api/expenses/')
+      .then(response => response.data);
+};
 
 const ExpensePage = (): ReactElement => {
 
@@ -35,7 +41,7 @@ const ExpensePage = (): ReactElement => {
     let updatedExpenses = [...expenseTypes];
     updatedExpenses.push({tagName: '', expenses: [], total: 0});
     setExpenseTypes(updatedExpenses);
-  }
+  };
 
   const handleCardChange = (indexPosition: number) => {
     // Instead of passing the index position within the component pass it before and return 
@@ -49,7 +55,24 @@ const ExpensePage = (): ReactElement => {
       console.log(expenseTypes);
       setExpenseTypes(updatedExpenses);
     }
-  }
+  };
+
+  useEffect(() => {
+    getExpenseData()
+      .then(initialExpenses => {
+        const initialExpenseCards = [
+          {
+            tagName: 'initial',
+            expenses: initialExpenses,
+            total: initialExpenses.reduce(
+                (acc, cur) => acc + cur.value * cur.payPeriodType,
+                0
+            )
+          }
+        ];
+        setExpenseTypes(initialExpenseCards);
+      })
+  }, []);
 
   console.log(expenseTypes);
   return (

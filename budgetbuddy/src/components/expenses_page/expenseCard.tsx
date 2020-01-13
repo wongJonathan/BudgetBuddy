@@ -1,5 +1,5 @@
 import React, { ReactElement, useState, useRef } from "react";
-import { ExpenseEntry, HandleChange, ISelectOnChagne } from "../../types";
+import { ExpenseEntry, HandleChange, ISelectOnChange } from "../../types";
 import { Button, Input, Card, CardContent, CardActions, Divider, Typography } from "@material-ui/core";
 import ExpenseInput from "./expenseInput";
 import { makeStyles } from "@material-ui/styles";
@@ -42,7 +42,7 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
 
   const [cardExpenses, setExpenses] = useState<ExpenseEntry[]>(expenses);
   const [totalExpense, setTotalExpense] = useState<number>(total);
-  const title = useRef('');
+  const [title, setTitle] = useState<string>(tagName);
   const classes = styles();
 
   const addExpense = () => {
@@ -50,7 +50,7 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
     handleChange({ expenses: updatedExpenses });
 
     setExpenses(updatedExpenses);
-  }
+  };
 
 
   const onChange = (id: number) => {
@@ -67,7 +67,7 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
       handleChange({ expenses: updatedExpenses });
       setExpenses(updatedExpenses);
     }
-  }
+  };
 
   const onChangeSelect = (id: number) => (
     (event: any, child?: object) => {
@@ -109,17 +109,23 @@ const ExpenseCard = ({total, tagName, expenses,  handleChange}: ExpenseCardProps
     }
     handleChange({ total: totalExpense + diff });
     setTotalExpense(totalExpense + diff);
-  }
+  };
 
-  const setTitle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const setCardTitle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     handleChange({tagName: e.target.value});
-  }
+    setTitle(e.target.value);
+  };
 
   return (
     <div className={classes.root}>
       <Card className={classes.card}>
         <CardContent>
-          <Input className={classes.titleDiv} placeholder="Enter Name of Type" onChange={setTitle} disableUnderline />
+          <Input
+              className={classes.titleDiv}
+              placeholder="Enter Name of Type"
+              onChange={setCardTitle} disableUnderline
+              value={title}
+          />
         </CardContent>
         <Divider />
         <CardContent>

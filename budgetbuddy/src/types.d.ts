@@ -10,7 +10,7 @@ export interface HandleChange {
 }
 
 // This is how onChange is typed for some reason
-export interface ISelectOnChagne {
+export interface ISelectOnChange {
   name?: string | undefined; 
   value: unknown; 
 }
