@@ -15,3 +15,8 @@ export interface ISelectOnChange {
   name?: string | undefined; 
   value: unknown; 
 }
+
+export interface TagListItem {
+  tagName: string;
+  identifier: string;
+}
