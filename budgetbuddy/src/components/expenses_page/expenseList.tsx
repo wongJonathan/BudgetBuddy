@@ -1,5 +1,5 @@
 import React, {ReactElement, useRef, useState, useCallback, useMemo, useEffect} from "react";
-import {Button, Typography, List, Fab, Zoom, Divider} from "@material-ui/core";
+import {Button, Typography, List, Fab, Zoom, Divider, makeStyles} from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import axios from 'axios';
 
@@ -23,12 +23,22 @@ interface IExpenseListItem {
   checked: boolean
 }
 
+const useStyles = makeStyles(theme => ({
+  addButton: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    left: '50%',
+  },
+}));
+
 const getExpenseData = (): Promise<ExpenseEntry[]> => {
   return axios.get('http://localhost:8000/api/expenses/')
       .then(response => response.data);
 };
 
 const ExpenseList = (): ReactElement => {
+  const classes = useStyles();
+
   const income = useRef(100000);
   const [expenseKeys, setExpenseKeys] = useState<IExpenseListItem[]>([]);
   const [currentDialog, setCurrentDialog] = useState<ReactElement>(<></>);
@@ -142,7 +152,12 @@ const ExpenseList = (): ReactElement => {
           ))
         }
       </List>
-      <Fab variant="extended" onClick={addExpenseKey}>
+      <Fab
+        className={classes.addButton}
+        color="primary"
+        variant="extended"
+        onClick={addExpenseKey}
+      >
         <AddIcon />
         Add Key
       </Fab>
