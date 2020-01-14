@@ -5,7 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Input,
+  Input, TextField,
 } from "@material-ui/core";
 import {TagListItem} from "../../types";
 
@@ -30,6 +30,7 @@ const AddTagDialog = ({createTag, cancelTag}: AddTagDialogProps): ReactElement =
 
   const handleCreate = () => {
     createTag({tagName, identifier});
+
     handleClose();
   };
 
@@ -43,7 +44,7 @@ const AddTagDialog = ({createTag, cancelTag}: AddTagDialogProps): ReactElement =
         Create Expense Key
       </DialogTitle>
       <DialogContent>
-        <Input
+        <TextField
           placeholder="Enter Tag Name Here"
           autoFocus
           value={tagName}
