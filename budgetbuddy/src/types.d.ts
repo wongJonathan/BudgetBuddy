@@ -14,3 +14,9 @@ export interface ISelectOnChange {
   name?: string | undefined; 
   value: unknown; 
 }
+
+interface IExpenseTag {
+  tagName: string;
+  total: number;
+  identifier: string; // Color
+}

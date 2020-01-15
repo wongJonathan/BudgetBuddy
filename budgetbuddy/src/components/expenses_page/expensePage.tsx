@@ -2,8 +2,16 @@ import React, {ReactElement, useRef, useState, useCallback, useMemo, useEffect} 
 import { Button, Typography } from "@material-ui/core";
 import axios from 'axios';
 
-import { ExpenseEntry, HandleChange } from '../../types';
+import {ExpenseEntry, HandleChange, IExpenseTag} from '../../types';
 import ExpenseCard from './expenseCard';
+import ExpenseTable from "./expenseTable";
+
+
+const mockData: IExpenseTag[] = [
+  { tagName: 'Tag 1', total: 500, identifier: '#FFFF00'},
+  { tagName: 'Tag 2', total: 500, identifier: '#808000'},
+  { tagName: 'Tag 3', total: 500, identifier: '#17A589'},
+];
 
 interface Expenses {
   [type: string]: {
@@ -25,73 +33,70 @@ const getExpenseData = (): Promise<ExpenseEntry[]> => {
 };
 
 const ExpensePage = (): ReactElement => {
-
   const income = useRef(100000);
-  const [expenseTypes, setExpenseTypes] = useState<IExpenseCard[]>([]);
+  const [expenseKeys, setExpenseKeys] = useState<IExpenseTag[]>(mockData);
+  const [currentDialog, setCurrentDialog] = useState<ReactElement>(<></>);
 
-  const totalSpent = useMemo(() => {
-    let total = 0;
-    expenseTypes.forEach((expenseCard: IExpenseCard) => {
-      total += expenseCard.total;
-    });
-    return total;
-  }, [expenseTypes]);
-
-  const addCard = () => {
-    let updatedExpenses = [...expenseTypes];
-    updatedExpenses.push({tagName: '', expenses: [], total: 0});
-    setExpenseTypes(updatedExpenses);
+  const handleCreate = (newTag: IExpenseTag) => {
+    setExpenseKeys(prevState => [...prevState, {
+        tagName: newTag.tagName,
+        total: 0,
+        identifier: newTag.identifier,
+      }]
+    );
   };
 
-  const handleCardChange = (indexPosition: number) => {
-    // Instead of passing the index position within the component pass it before and return 
-    // the callback function
-    return (change: HandleChange) => {
-      let updatedExpenses = [...expenseTypes];
-      Object.keys(change).forEach((key: string) => {
-        updatedExpenses[indexPosition][key] = change[key];
-      });
-
-      console.log(expenseTypes);
-      setExpenseTypes(updatedExpenses);
+  const handleEdit = (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => {
+    if (oldTag) {
+      const index = expenseKeys.indexOf(oldTag);
+      const updatedList = [...expenseKeys];
+      updatedList[index] = newTag;
+      setExpenseKeys(updatedList);
     }
   };
 
+  const handleDelete = (deletedTag: IExpenseTag) => {
+    const index = expenseKeys.indexOf(deletedTag);
+    const updatedList = [...expenseKeys];
+
+    updatedList.splice(index, 1);
+    setExpenseKeys(updatedList);
+  };
+
   useEffect(() => {
-    getExpenseData()
-      .then(initialExpenses => {
-        const initialExpenseCards = [
-          {
-            tagName: 'initial',
-            expenses: initialExpenses,
-            total: initialExpenses.reduce(
-                (acc, cur) => acc + cur.value * cur.payPeriodType,
-                0
-            )
-          }
-        ];
-        setExpenseTypes(initialExpenseCards);
-      })
+    // getExpenseData()
+    //   .then(initialExpenses => {
+    //     const initialExpenseCards = [
+    //       {
+    //         tagName: 'initial',
+    //         expenses: initialExpenses,
+    //         total: initialExpenses.reduce(
+    //             (acc, cur) => acc + cur.value * cur.payPeriodType,
+    //             0
+    //         )
+    //       }
+    //     ];
+    //     setExpenseTypes(initialExpenseCards);
+    //   })
   }, []);
 
-  console.log(expenseTypes);
+  console.log(expenseKeys);
   return (
     <div>
+      {currentDialog}
       <div>
         <Typography variant="h5">{`Total income: ${income.current}`}</Typography>
-        <Typography variant="h6">{`Total spent: ${totalSpent}`}</Typography>
-        <Typography variant="h6">{`Left over: ${income.current - totalSpent}`}</Typography>
+        <Typography variant="h6">{`Total spent: ${0}`}</Typography>
+        <Typography variant="h6">{`Left over: ${income.current - 0}`}</Typography>
       </div>
-      <Button onClick={addCard} > Add Expense Type </Button>
-      <div>
-        {
-          expenseTypes.map((type: IExpenseCard, index: number) => {
-            return <ExpenseCard total={type.total} tagName={type.tagName} expenses={type.expenses} handleChange={handleCardChange(index)} />;
-          })
-        }
-      </div>
+      <ExpenseTable
+        data={expenseKeys}
+        handleCreate={handleCreate}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+      />
     </div>
   )
-}
+};
 
 export default ExpensePage;
