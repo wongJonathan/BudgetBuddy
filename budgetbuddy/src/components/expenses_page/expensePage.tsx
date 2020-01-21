@@ -8,9 +8,9 @@ import ExpenseTable from "./expenseTable";
 
 
 const mockData: IExpenseTag[] = [
-  {tagName: 'Tag 1', total: 500, identifier: '#FFFF00', expenses: []},
-  {tagName: 'Tag 2', total: 500, identifier: '#808000', expenses: []},
-  {tagName: 'Tag 3', total: 500, identifier: '#17A589', expenses: []},
+  {tagName: 'Tag 1', total: 0, identifier: '#FFFF00', expenses: []},
+  {tagName: 'Tag 2', total: 0, identifier: '#808000', expenses: []},
+  {tagName: 'Tag 3', total: 0, identifier: '#17A589', expenses: []},
 ];
 
 const getExpenseData = (): Promise<ExpenseEntry[]> => {

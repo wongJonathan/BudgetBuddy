@@ -78,15 +78,26 @@ const ExpenseEntryTable = ({data, handleEdit}: expenseEntryTableProps): ReactEle
           editable={{
             onRowAdd: newTag =>
               new Promise((resolve, reject) => {
+                if (!newTag.hasOwnProperty('expenseName')) {
+                  newTag.expenseName = '';
+                }
+
+                if (!newTag.hasOwnProperty('value')) {
+                  newTag.value = 0;
+                }
+                
                 data.expenses.push(newTag);
+                data.total += newTag.value * newTag.payPeriodType;
                 handleEdit(data);
                 resolve();
               }),
             onRowUpdate: (newData, oldData) =>
               new Promise((resolve, reject) => {
                 if (oldData) {
+                  const diffValue = newData.value * newData.payPeriodType - oldData.value * oldData.payPeriodType;
                   const index = data.expenses.indexOf(oldData);
                   data.expenses[index] = newData;
+                  data.total += diffValue;
                   handleEdit(data);
                 }
                 resolve();
@@ -97,6 +108,7 @@ const ExpenseEntryTable = ({data, handleEdit}: expenseEntryTableProps): ReactEle
                 return new Promise((resolve, reject) => {
                   const index = data.expenses.indexOf(oldData);
                   data.expenses.splice(index, 1);
+                  data.total -= oldData.value * oldData.payPeriodType;
                   handleEdit(data);
                   resolve();
                 })

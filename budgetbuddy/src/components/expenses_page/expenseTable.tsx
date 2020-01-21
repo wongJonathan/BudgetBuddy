@@ -1,12 +1,9 @@
 import React, {ReactElement, useState, useRef, createRef,} from "react";
 import MaterialTable from "material-table";
 import LensIcon from '@material-ui/icons/Lens';
-import {GithubPicker} from 'react-color';
 
 import {IExpenseTag} from "../../types";
 import ExpenseEntryTable from "./expenseEntryTable";
-import {IconButton, Popover} from "@material-ui/core";
-import ColorPickerDialog from "./colorPickerDialog";
 import ColorPickerEditComponent from './colorPickerEditComponent';
 
 type handleEdit = (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => void;
