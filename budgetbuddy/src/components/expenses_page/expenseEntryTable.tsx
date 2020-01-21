@@ -22,7 +22,6 @@ const payPeriods: string[] = Object.keys(PayPeriod)
 
 const ExpenseEntryTable = ({data, handleEdit}: expenseEntryTableProps): ReactElement => {
   const classes = useStyle();
-
   return(
     <div style={{
       backgroundColor: data.identifier,

@@ -1,9 +1,13 @@
-import React, {ReactElement, useState, useRef, } from "react";
+import React, {ReactElement, useState, useRef, createRef,} from "react";
 import MaterialTable from "material-table";
 import LensIcon from '@material-ui/icons/Lens';
+import {GithubPicker} from 'react-color';
 
 import {IExpenseTag} from "../../types";
 import ExpenseEntryTable from "./expenseEntryTable";
+import {IconButton, Popover} from "@material-ui/core";
+import ColorPickerDialog from "./colorPickerDialog";
+import ColorPickerEditComponent from './colorPickerEditComponent';
 
 type handleEdit = (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => void;
 
@@ -22,13 +26,11 @@ const ExpenseTable = (
     handleDelete
   }: expenseTableProps
 ): ReactElement => {
-
   const handleEntryEdit = (currentTag: IExpenseTag): ((newExpenseTag: IExpenseTag) => void) => {
     return (newExpenseTag: IExpenseTag): void => {
       handleEdit(newExpenseTag, currentTag);
     };
-  } ;
-
+  };
 
   return (
     <>
@@ -45,6 +47,7 @@ const ExpenseTable = (
             render: rowData => (
               <LensIcon style={{color: rowData.identifier}} />
             ),
+            editComponent: props => <ColorPickerEditComponent props={props} />,
             cellStyle: {
               width: '128px',
             },
