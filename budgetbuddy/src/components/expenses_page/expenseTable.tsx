@@ -1,13 +1,16 @@
 import React, {ReactElement, useState, useRef, } from "react";
-import MaterialTable, { Column} from "material-table";
+import MaterialTable from "material-table";
 import LensIcon from '@material-ui/icons/Lens';
 
 import {IExpenseTag} from "../../types";
+import ExpenseEntryTable from "./expenseEntryTable";
+
+type handleEdit = (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => void;
 
 interface expenseTableProps {
   data: IExpenseTag[];
   handleCreate: (newTag: IExpenseTag) => void;
-  handleEdit: (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => void;
+  handleEdit: handleEdit;
   handleDelete: (deletedTag: IExpenseTag) => void;
 }
 
@@ -20,9 +23,17 @@ const ExpenseTable = (
   }: expenseTableProps
 ): ReactElement => {
 
+  const handleEntryEdit = (currentTag: IExpenseTag): ((newExpenseTag: IExpenseTag) => void) => {
+    return (newExpenseTag: IExpenseTag): void => {
+      handleEdit(newExpenseTag, currentTag);
+    };
+  } ;
+
+
   return (
     <>
       <MaterialTable
+        title="Expense Tags"
         options={{
           sorting: true,
           selection: true,
@@ -63,6 +74,15 @@ const ExpenseTable = (
             }),
           }
         }
+        detailPanel={
+          rowData =>
+            <ExpenseEntryTable data={rowData} handleEdit={handleEntryEdit(rowData)} />
+        }
+        onRowClick={(event, rowData, togglePanel) => {
+          if(togglePanel) {
+            togglePanel();
+          }
+        }}
       />
     </>
   )

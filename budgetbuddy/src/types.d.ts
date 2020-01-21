@@ -19,4 +19,5 @@ interface IExpenseTag {
   tagName: string;
   total: number;
   identifier: string; // Color
+  expenses: ExpenseEntry[];
 }

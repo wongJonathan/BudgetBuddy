@@ -1,5 +1,5 @@
 import React, {ReactElement, useRef, useState, useCallback, useMemo, useEffect} from "react";
-import { Button, Typography } from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 import axios from 'axios';
 
 import {ExpenseEntry, HandleChange, IExpenseTag} from '../../types';
@@ -8,28 +8,14 @@ import ExpenseTable from "./expenseTable";
 
 
 const mockData: IExpenseTag[] = [
-  { tagName: 'Tag 1', total: 500, identifier: '#FFFF00'},
-  { tagName: 'Tag 2', total: 500, identifier: '#808000'},
-  { tagName: 'Tag 3', total: 500, identifier: '#17A589'},
+  {tagName: 'Tag 1', total: 500, identifier: '#FFFF00', expenses: []},
+  {tagName: 'Tag 2', total: 500, identifier: '#808000', expenses: []},
+  {tagName: 'Tag 3', total: 500, identifier: '#17A589', expenses: []},
 ];
-
-interface Expenses {
-  [type: string]: {
-    recurrence: number;
-    expenses: ExpenseEntry[];
-  }
-}
-
-interface IExpenseCard {
-  tagName: string;
-  expenses: ExpenseEntry[];
-  total: number;
-  [key: string]: string | ExpenseEntry[] | number;
-}
 
 const getExpenseData = (): Promise<ExpenseEntry[]> => {
   return axios.get('http://localhost:8000/api/expenses/')
-      .then(response => response.data);
+    .then(response => response.data);
 };
 
 const ExpensePage = (): ReactElement => {
@@ -42,6 +28,7 @@ const ExpensePage = (): ReactElement => {
         tagName: newTag.tagName,
         total: 0,
         identifier: newTag.identifier,
+        expenses: [],
       }]
     );
   };
