@@ -1,7 +1,12 @@
 from django.db import models
 
 
-# Create your models here.
+class ExpenseTag(models.Model):
+    tagName = models.CharField(max_length=256)
+    total = models.PositiveIntegerField()
+    identifier = models.CharField(max_length=9)
+
+
 class Expense(models.Model):
 
     class PayPeriodType(models.IntegerChoices):
@@ -15,6 +20,7 @@ class Expense(models.Model):
     expenseName = models.CharField(max_length=256)
     value = models.PositiveIntegerField()
     payPeriodType = models.IntegerField(choices=PayPeriodType.choices)
+    expenseTag = models.ForeignKey(ExpenseTag, on_delete=models.CASCADE, null=True)
 
     def _str_(self):
         return self.expenseName

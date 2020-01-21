@@ -20,6 +20,9 @@ const useStyle = makeStyles(theme => ({
 const payPeriods: string[] = Object.keys(PayPeriod)
   .filter(payperiod => typeof PayPeriod[payperiod as keyof typeof PayPeriod] === 'number') as string[];
 
+/**
+ * Table that displays expense entries. Can create, edit, and delete entries.
+ */
 const ExpenseEntryTable = ({data, handleEdit}: expenseEntryTableProps): ReactElement => {
   const classes = useStyle();
   return(
@@ -85,7 +88,7 @@ const ExpenseEntryTable = ({data, handleEdit}: expenseEntryTableProps): ReactEle
                 if (!newTag.hasOwnProperty('value')) {
                   newTag.value = 0;
                 }
-                
+
                 data.expenses.push(newTag);
                 data.total += newTag.value * newTag.payPeriodType;
                 handleEdit(data);

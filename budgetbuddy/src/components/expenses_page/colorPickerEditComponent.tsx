@@ -8,6 +8,9 @@ interface colorPickerProps {
   props: EditComponentProps<object>;
 }
 
+/**
+ * Edit component for the material table label field
+ */
 const ColorPickerEditComponent = ({props}: colorPickerProps): ReactElement => {
   const [colorPickerDialog, setColorPickerDialog] = useState<ReactElement>(<></>);
 

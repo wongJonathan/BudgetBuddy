@@ -15,6 +15,10 @@ interface expenseTableProps {
   handleDelete: (deletedTag: IExpenseTag) => void;
 }
 
+/**
+ * Displays all expense tags. Allows to create, edit, and delete of tags.
+ * Clicking a row shows the tag's expenses.
+ */
 const ExpenseTable = (
   {
     data,
