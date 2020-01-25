@@ -15,7 +15,7 @@ interface expenseEntryTableProps {
 
 const useStyle = makeStyles(theme => ({
   tableContainer: {
-    margin: theme.spacing(0, 2),
+    margin: theme.spacing(0, 3),
   },
 }));
 
@@ -73,6 +73,7 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTa
           options={{
             sorting: true,
             selection: true,
+            paging: false,
           }}
           columns={[
             {title: 'Name', field: 'expenseName'},

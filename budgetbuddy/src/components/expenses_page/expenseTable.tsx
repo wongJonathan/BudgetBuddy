@@ -1,4 +1,4 @@
-import React, {ReactElement, useState, useRef, createRef,} from "react";
+import React, {ReactElement, useState, useRef, createRef, useEffect,} from "react";
 import MaterialTable from "material-table";
 import LensIcon from '@material-ui/icons/Lens';
 
@@ -31,7 +31,7 @@ const ExpenseTable = (
 
   const updateTotal = (addValue: number, tagId: number): void => {
     const tagIndex = tags.findIndex((tag) => tag.id === tagId);
-    if (tagIndex) {
+    if (tagIndex !== -1) {
       const updatedTags = [...tags];
       updatedTags[tagIndex].total += addValue;
       setTags(updatedTags);
@@ -44,9 +44,10 @@ const ExpenseTable = (
     };
   };
 
-  console.log(tags);
-  console.log(data);
-
+  useEffect(() => {
+    setTags(data);
+  }, [data]);
+  
   return (
     <>
       <MaterialTable
@@ -54,6 +55,7 @@ const ExpenseTable = (
         options={{
           sorting: true,
           selection: true,
+          paging: false,
         }}
         columns={[
           {
@@ -64,10 +66,14 @@ const ExpenseTable = (
             ),
             editComponent: props => <ColorPickerEditComponent props={props} />,
             cellStyle: {
-              width: '128px',
+              paddingLeft: 0,
+              paddingRight: 0,
+              width: 64,
             },
             headerStyle: {
-              width: '128px',
+              paddingLeft: 0,
+              paddingRight: 0,
+              width: 64,
             },
           },
           { title: 'Tag Name', field: 'tagName'},
@@ -77,7 +83,7 @@ const ExpenseTable = (
             editable: 'never',
           }
         ]}
-        data={data}
+        data={tags}
         editable={{
           onRowAdd: newTag =>
             new Promise((resolve, reject) => {
