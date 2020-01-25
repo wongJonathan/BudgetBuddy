@@ -27,11 +27,25 @@ const ExpenseTable = (
     handleDelete
   }: expenseTableProps
 ): ReactElement => {
+  const [tags, setTags] = useState<IExpenseTag[]>(data);
+
+  const updateTotal = (addValue: number, tagId: number): void => {
+    const tagIndex = tags.findIndex((tag) => tag.id === tagId);
+    if (tagIndex) {
+      const updatedTags = [...tags];
+      updatedTags[tagIndex].total += addValue;
+      setTags(updatedTags);
+    }
+  };
+
   const handleEntryEdit = (currentTag: IExpenseTag): ((newExpenseTag: IExpenseTag) => void) => {
     return (newExpenseTag: IExpenseTag): void => {
       handleEdit(newExpenseTag, currentTag);
     };
   };
+
+  console.log(tags);
+  console.log(data);
 
   return (
     <>
@@ -57,7 +71,11 @@ const ExpenseTable = (
             },
           },
           { title: 'Tag Name', field: 'tagName'},
-          { title: 'Total', field: 'total'}
+          {
+            title: 'Total',
+            field: 'total',
+            editable: 'never',
+          }
         ]}
         data={data}
         editable={{
@@ -80,7 +98,11 @@ const ExpenseTable = (
         }
         detailPanel={
           rowData =>
-            <ExpenseEntryTable data={rowData} handleEdit={handleEntryEdit(rowData)} />
+            <ExpenseEntryTable
+              currentTag={rowData}
+              handleEdit={handleEntryEdit(rowData)}
+              updateTotal={updateTotal}
+            />
         }
         onRowClick={(event, rowData, togglePanel) => {
           if(togglePanel) {

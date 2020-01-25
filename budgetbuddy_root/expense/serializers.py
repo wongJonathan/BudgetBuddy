@@ -8,6 +8,8 @@ class ExpenseTagSerializer(serializers.ModelSerializer):
         fields = ('id', 'tagName', 'total', 'identifier')
 
 
+
+
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense

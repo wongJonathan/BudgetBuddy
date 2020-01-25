@@ -1,14 +1,16 @@
-// Gets the keys of all the PayPeriod enum
-import {PayPeriod} from "../../enum";
-import {IExpenseTag} from "../../types";
-import React, {ReactElement} from "react";
+import React, {ReactElement, useState} from "react";
 import MaterialTable from "material-table";
 import {makeStyles, MenuItem, Select, TextField, Typography} from "@material-ui/core";
+import axios from 'axios';
+
+import {PayPeriod} from "../../enum";
+import {ExpenseEntry, IExpenseTag} from "../../types";
 
 
 interface expenseEntryTableProps {
-  data: IExpenseTag;
+  currentTag: IExpenseTag;
   handleEdit: (newExpenseTag: IExpenseTag) => void;
+  updateTotal: (addValue: number, tagId: number) => void;
 }
 
 const useStyle = makeStyles(theme => ({
@@ -20,24 +22,60 @@ const useStyle = makeStyles(theme => ({
 const payPeriods: string[] = Object.keys(PayPeriod)
   .filter(payperiod => typeof PayPeriod[payperiod as keyof typeof PayPeriod] === 'number') as string[];
 
+const createTag = (newExpense: ExpenseEntry, tagId: number): Promise<ExpenseEntry> => (
+  axios.post('http://localhost:8000/api/expenses/', {
+    expenseName: newExpense.expenseName,
+    value: newExpense.value,
+    payPeriodType: newExpense.payPeriodType,
+    expenseTag: tagId,
+  })
+);
+
 /**
  * Table that displays expense entries. Can create, edit, and delete entries.
  */
-const ExpenseEntryTable = ({data, handleEdit}: expenseEntryTableProps): ReactElement => {
+const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTableProps): ReactElement => {
   const classes = useStyle();
-  return(
+
+  const [expenses, setExpenses] = useState<ExpenseEntry[]>(currentTag.expenses);
+
+  const handleCreate = (newExpense: ExpenseEntry): Promise<any> => (
+    new Promise((resolve, reject) => {
+      if (!newExpense.hasOwnProperty('expenseName')) {
+        newExpense.expenseName = '';
+      }
+
+      if (!newExpense.hasOwnProperty('value')) {
+        newExpense.value = 0;
+      }
+
+      createTag(newExpense, currentTag.id).then(response => {
+        console.log(response);
+        if (response.status === 201) {
+          setExpenses(prevState => [...prevState, response.data]);
+          // currentTag.total += response.data.value * response.data.payPeriodType;
+          updateTotal(response.data.value * response.data.payPeriodType, currentTag.id);
+          resolve();
+        } else {
+          reject();
+        }
+      });
+    })
+  );
+
+  return (
     <div style={{
-      backgroundColor: data.identifier,
+      backgroundColor: currentTag.identifier,
     }}>
       <div className={classes.tableContainer}>
         <MaterialTable
-          title={`${data.tagName} expenses`}
+          title={`${currentTag.tagName} expenses`}
           options={{
             sorting: true,
             selection: true,
           }}
           columns={[
-            { title: 'Name', field: 'expenseName' },
+            {title: 'Name', field: 'expenseName'},
             {
               title: 'Cost',
               field: 'value',
@@ -77,47 +115,32 @@ const ExpenseEntryTable = ({data, handleEdit}: expenseEntryTableProps): ReactEle
               render: rowData => <Typography>{PayPeriod[rowData.payPeriodType]}</Typography>
             }
           ]}
-          data={data.expenses}
+          data={expenses}
           editable={{
-            onRowAdd: newTag =>
-              new Promise((resolve, reject) => {
-                if (!newTag.hasOwnProperty('expenseName')) {
-                  newTag.expenseName = '';
-                }
-
-                if (!newTag.hasOwnProperty('value')) {
-                  newTag.value = 0;
-                }
-
-                data.expenses.push(newTag);
-                data.total += newTag.value * newTag.payPeriodType;
-                handleEdit(data);
-                resolve();
-              }),
+            onRowAdd: handleCreate,
             onRowUpdate: (newData, oldData) =>
               new Promise((resolve, reject) => {
                 if (oldData) {
                   const diffValue = newData.value * newData.payPeriodType - oldData.value * oldData.payPeriodType;
-                  const index = data.expenses.indexOf(oldData);
-                  data.expenses[index] = newData;
-                  data.total += diffValue;
-                  handleEdit(data);
+                  const index = currentTag.expenses.indexOf(oldData);
+                  currentTag.expenses[index] = newData;
+                  currentTag.total += diffValue;
+                  handleEdit(currentTag);
                 }
                 resolve();
               }),
-            onRowDelete: oldData =>
-              {
-                console.log('deletesd')
-                return new Promise((resolve, reject) => {
-                  const index = data.expenses.indexOf(oldData);
-                  data.expenses.splice(index, 1);
-                  data.total -= oldData.value * oldData.payPeriodType;
-                  handleEdit(data);
-                  resolve();
-                })
-              }
-              ,
+            onRowDelete: oldData => {
+              console.log('deletesd')
+              return new Promise((resolve, reject) => {
+                const index = currentTag.expenses.indexOf(oldData);
+                currentTag.expenses.splice(index, 1);
+                currentTag.total -= oldData.value * oldData.payPeriodType;
+                handleEdit(currentTag);
+                resolve();
+              })
             }
+            ,
+          }
           }
         />
       </div>

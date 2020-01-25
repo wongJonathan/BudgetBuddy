@@ -32,22 +32,36 @@ const ExpensePage = (): ReactElement => {
   const [currentDialog, setCurrentDialog] = useState<ReactElement>(<></>);
 
   const handleCreate = (newTag: IExpenseTag) => {
-    setExpenseKeys(prevState => [...prevState, {
-      id: 5,
-        tagName: newTag.tagName,
-        total: 0,
-        identifier: newTag.identifier,
-        expenses: [],
-      }]
-    );
+    axios.post('http://localhost:8000/api/expenseTags/', {
+      tagName: newTag.tagName,
+      total: 0,
+      identifier: newTag.identifier,
+      expenses: [],
+    }).then((response) => {
+      if (response.status === 201) {
+        setExpenseKeys(prevState => [...prevState, response.data]);
+      }
+    });
   };
 
   const handleEdit = (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => {
     if (oldTag) {
-      const index = expenseKeys.indexOf(oldTag);
-      const updatedList = [...expenseKeys];
-      updatedList[index] = newTag;
-      setExpenseKeys(updatedList);
+      axios.patch(`http://localhost:8000/api/expenseTags/${newTag.id}/`, {
+        id: newTag.id,
+        tagName: newTag.tagName,
+        total: newTag.total,
+        identifier: newTag.identifier,
+        expenses: newTag.expenses,
+      }).then((response) => {
+        console.log(response)
+        if (response.status === 200) {
+          const index = expenseKeys.indexOf(oldTag);
+          const updatedList = [...expenseKeys];
+          console.log(response.data);
+          updatedList[index] = response.data;
+          setExpenseKeys(updatedList);
+        }
+      });
     }
   };
 

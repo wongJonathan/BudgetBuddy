@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.response import Response
+
 from .serializers import ExpenseSerializer, ExpenseTagSerializer
 from .models import Expense, ExpenseTag
 
@@ -18,3 +20,4 @@ class ExpenseView(viewsets.ModelViewSet):
 class ExpenseTagView(viewsets.ModelViewSet):
     serializer_class = ExpenseTagSerializer
     queryset = ExpenseTag.objects.all()
+
