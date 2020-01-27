@@ -1,4 +1,5 @@
 export interface ExpenseEntry {
+  id: number;
   expenseName: string;
   value: number;
   payPeriodType?: PayPeriod;
@@ -13,4 +14,12 @@ export interface HandleChange {
 export interface ISelectOnChange {
   name?: string | undefined; 
   value: unknown; 
+}
+
+interface IExpenseTag {
+  id: number;
+  tagName: string;
+  total: number;
+  identifier: string; // Color
+  expenses: ExpenseEntry[];
 }

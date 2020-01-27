@@ -21,6 +21,7 @@ from expense import views
 
 router = routers.DefaultRouter()
 router.register(r'expenses', views.ExpenseView, ' expense')
+router.register(r'expenseTags', views.ExpenseTagView, ' expenseTag')
 
 
 urlpatterns = [

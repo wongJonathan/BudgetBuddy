@@ -1,2 +1,2 @@
 # BudgetBuddy
-Budget tracking webapp using react, fastApi
+Budget tracking webapp using react, django
