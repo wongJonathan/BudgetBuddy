@@ -37,7 +37,7 @@ const createTag = (newExpense: ExpenseEntry, tagId: number): Promise<ExpenseEntr
 const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTableProps): ReactElement => {
   const classes = useStyle();
 
-  const [expenses, setExpenses] = useState<ExpenseEntry[]>(currentTag.expenses);
+  const [expenses, setExpenses] = useState<ExpenseEntry[]>(currentTag.expenses || []);
 
   const handleCreate = (newExpense: ExpenseEntry): Promise<any> => (
     new Promise((resolve, reject) => {
@@ -49,6 +49,8 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTa
         newExpense.value = 0;
       }
 
+      console.log(currentTag);
+      console.log(expenses);
       createTag(newExpense, currentTag.id).then(response => {
         console.log(response);
         if (response.status === 201) {

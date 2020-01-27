@@ -4,14 +4,7 @@ import axios from 'axios';
 
 import {ExpenseEntry, HandleChange, IExpenseTag} from '../../types';
 import ExpenseTable from "./expenseTable";
-import {PayPeriod} from "../../enum";
 
-
-// const mockData: IExpenseTag[] = [
-//   {tagName: 'Tag 1', total: 0, identifier: '#FFFF00', expenses: []},
-//   {tagName: 'Tag 2', total: 0, identifier: '#808000', expenses: []},
-//   {tagName: 'Tag 3', total: 0, identifier: '#17A589', expenses: []},
-// ];
 
 const getExpenseTags = (): Promise<IExpenseTag[]> => {
   return axios.get('http://localhost:8000/api/expenseTags/')
@@ -30,6 +23,12 @@ const ExpensePage = (): ReactElement => {
   const income = useRef(100000);
   const [expenseKeys, setExpenseKeys] = useState<IExpenseTag[]>([]);
   const [currentDialog, setCurrentDialog] = useState<ReactElement>(<></>);
+
+  const totalExpense = useMemo(() => (
+    expenseKeys.reduce((prev, curr) => (
+      prev + curr.total
+    ), 0)
+  ), [expenseKeys]);
 
   const handleCreate = (newTag: IExpenseTag) => {
     axios.post('http://localhost:8000/api/expenseTags/', {
@@ -101,8 +100,8 @@ const ExpensePage = (): ReactElement => {
       {currentDialog}
       <div>
         <Typography variant="h5">{`Total income: ${income.current}`}</Typography>
-        <Typography variant="h6">{`Total spent: ${0}`}</Typography>
-        <Typography variant="h6">{`Left over: ${income.current - 0}`}</Typography>
+        <Typography variant="h6">{`Total spent: ${totalExpense}`}</Typography>
+        <Typography variant="h6">{`Left over: ${income.current - totalExpense}`}</Typography>
       </div>
       <ExpenseTable
         data={expenseKeys}

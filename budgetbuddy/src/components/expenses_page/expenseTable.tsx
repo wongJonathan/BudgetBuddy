@@ -47,7 +47,7 @@ const ExpenseTable = (
   useEffect(() => {
     setTags(data);
   }, [data]);
-  
+
   return (
     <>
       <MaterialTable
