@@ -1,13 +1,11 @@
-import React, {ReactElement, useState} from "react";
+import React, {ReactElement, useState} from 'react';
 import {
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
-  Input, makeStyles, TextField,
-} from "@material-ui/core";
-import {CirclePicker, ColorResult} from "react-color";
+   makeStyles,
+} from '@material-ui/core';
+import {CirclePicker, ColorResult} from 'react-color';
 
 
 interface ColorPickerDialog {
@@ -26,18 +24,12 @@ const ColorPickerDialog = ({selectPicker, cancel}: ColorPickerDialog): ReactElem
   const classes = useStyle();
 
   const [open, setOpen] = useState(true);
-  const [tagName, setTagName] = useState('');
-  const [identifier, setIdentifier] = useState('#f44e3b');
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setOpen(false);
   };
 
-  const handleKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTagName(event.target.value);
-  };
-
-  const handleCreate = (color: ColorResult) => {
+  const handleCreate = (color: ColorResult): void => {
     selectPicker(color.hex);
     handleClose();
   };

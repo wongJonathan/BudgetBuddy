@@ -5,4 +5,4 @@ export enum PayPeriod {
   BiWeekly = 26,
   Weekly = 52,
   Daily = 365,
-};
+}

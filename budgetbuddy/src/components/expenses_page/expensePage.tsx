@@ -1,12 +1,19 @@
-import React, {ReactElement, useRef, useState, useCallback, useMemo, useEffect} from "react";
-import {Button, Typography} from "@material-ui/core";
+import React, 
+{
+  ReactElement, 
+  useRef, 
+  useState, 
+  useMemo, 
+  useEffect
+} from 'react';
+import {Typography} from '@material-ui/core';
 import axios from 'axios';
 
-import {ExpenseEntry, HandleChange, IExpenseTag} from '../../types';
-import ExpenseTable from "./expenseTable";
+import {ExpenseEntry, ExpenseTag} from '../../types';
+import ExpenseTable from './expenseTable';
 
 
-const getExpenseTags = (): Promise<IExpenseTag[]> => {
+const getExpenseTags = (): Promise<ExpenseTag[]> => {
   return axios.get('http://localhost:8000/api/expenseTags/')
     .then(response => response.data);
 };
@@ -21,8 +28,7 @@ const getExpenseEntries = (expenseId: number): Promise<ExpenseEntry[]> => {
  */
 const ExpensePage = (): ReactElement => {
   const income = useRef(100000);
-  const [expenseKeys, setExpenseKeys] = useState<IExpenseTag[]>([]);
-  const [currentDialog, setCurrentDialog] = useState<ReactElement>(<></>);
+  const [expenseKeys, setExpenseKeys] = useState<ExpenseTag[]>([]);
 
   const totalExpense = useMemo(() => (
     expenseKeys.reduce((prev, curr) => (
@@ -30,7 +36,7 @@ const ExpensePage = (): ReactElement => {
     ), 0)
   ), [expenseKeys]);
 
-  const handleCreate = (newTag: IExpenseTag) => {
+  const handleCreate = (newTag: ExpenseTag): void => {
     axios.post('http://localhost:8000/api/expenseTags/', {
       tagName: newTag.tagName,
       total: 0,
@@ -43,7 +49,7 @@ const ExpensePage = (): ReactElement => {
     });
   };
 
-  const handleEdit = (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => {
+  const handleEdit = (newTag: ExpenseTag, oldTag: ExpenseTag | undefined): void => {
     if (oldTag) {
       axios.patch(`http://localhost:8000/api/expenseTags/${newTag.id}/`, {
         id: newTag.id,
@@ -64,7 +70,7 @@ const ExpensePage = (): ReactElement => {
     }
   };
 
-  const handleDelete = (deletedTag: IExpenseTag) => {
+  const handleDelete = (deletedTag: ExpenseTag): void => {
     const index = expenseKeys.indexOf(deletedTag);
     const updatedList = [...expenseKeys];
 
@@ -97,7 +103,6 @@ const ExpensePage = (): ReactElement => {
   console.log(expenseKeys);
   return (
     <div>
-      {currentDialog}
       <div>
         <Typography variant="h5">{`Total income: ${income.current}`}</Typography>
         <Typography variant="h6">{`Total spent: ${totalExpense}`}</Typography>
