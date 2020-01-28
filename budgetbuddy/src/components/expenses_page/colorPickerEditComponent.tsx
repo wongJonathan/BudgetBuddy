@@ -28,7 +28,7 @@ const ColorPickerEditComponent = ({props}: ColorPickerProps): ReactElement => {
 
   return (
     <>
-      <IconButton onClick={openColorPicker} >
+      <IconButton aria-label="edit label color" onClick={openColorPicker} >
         <LensIcon style={{color: props.value}} />
       </IconButton>
       { colorPickerDialog }
