@@ -6,11 +6,12 @@ import {
    makeStyles,
 } from '@material-ui/core';
 import {CirclePicker, ColorResult} from 'react-color';
+import {DialogProps} from "@material-ui/core/Dialog";
 
 
 interface ColorPickerDialog {
-  selectPicker: (color: string) => void;
-  cancel: () => void;
+  props: DialogProps;
+  selectPicker: (colorCode: string) => void;
 }
 
 const useStyle = makeStyles(theme => ({
@@ -20,25 +21,17 @@ const useStyle = makeStyles(theme => ({
   },
 }));
 
-const ColorPickerDialog = ({selectPicker, cancel}: ColorPickerDialog): ReactElement => {
+const ColorPickerDialog = ({props, selectPicker}: ColorPickerDialog): ReactElement => {
   const classes = useStyle();
-
-  const [open, setOpen] = useState(true);
-
-  const handleClose = (): void => {
-    setOpen(false);
-  };
-
+console.log('test')
   const handleCreate = (color: ColorResult): void => {
+    console.log('handlecreate')
     selectPicker(color.hex);
-    handleClose();
   };
 
   return (
     <Dialog
-      open={open}
-      onClose={handleClose}
-      onExited={cancel}
+      {...props}
     >
       <DialogTitle>
         Select tag color

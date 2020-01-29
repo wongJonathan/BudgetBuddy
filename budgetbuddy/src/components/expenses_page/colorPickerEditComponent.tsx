@@ -12,18 +12,19 @@ interface ColorPickerProps {
  * Edit component for the material table label field
  */
 const ColorPickerEditComponent = ({props}: ColorPickerProps): ReactElement => {
-  const [colorPickerDialog, setColorPickerDialog] = useState<ReactElement>(<></>);
+  const [open, setOpen] = useState(false);
 
   const selectColor = (color: string): void => {
     props.onChange(color);
-  };
-
-  const closeColorPicker = (): void => {
-    setColorPickerDialog(<></>);
+    setOpen(false);
   };
 
   const openColorPicker = (): void => {
-    setColorPickerDialog(<ColorPickerDialog selectPicker={selectColor} cancel={closeColorPicker}/>)
+    setOpen(true);
+  };
+
+  const closeColorPicker = (): void => {
+    setOpen(false);
   };
 
   return (
@@ -31,7 +32,14 @@ const ColorPickerEditComponent = ({props}: ColorPickerProps): ReactElement => {
       <IconButton aria-label="edit label color" onClick={openColorPicker} >
         <LensIcon style={{color: props.value}} />
       </IconButton>
-      { colorPickerDialog }
+      <ColorPickerDialog
+        props={{
+          open,
+          onClose: closeColorPicker,
+          onExited: closeColorPicker,
+        }}
+        selectPicker={selectColor}
+      />
     </>
   )
 };
