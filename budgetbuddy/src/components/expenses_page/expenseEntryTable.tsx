@@ -67,6 +67,8 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: ExpenseEntryTa
 
   const handleCostEdit = (props: EditComponentProps<ExpenseEntry>): ReactElement => (
     <TextField
+      inputProps={{ "aria-label": "cost-input" }}
+      aria-label="cost"
       type="number"
       value={props.value || ''}
       onChange={(e): void => props.onChange(parseInt(e.target.value))}

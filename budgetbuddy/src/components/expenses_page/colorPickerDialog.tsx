@@ -23,9 +23,8 @@ const useStyle = makeStyles(theme => ({
 
 const ColorPickerDialog = ({props, selectPicker}: ColorPickerDialog): ReactElement => {
   const classes = useStyle();
-console.log('test')
+
   const handleCreate = (color: ColorResult): void => {
-    console.log('handlecreate')
     selectPicker(color.hex);
   };
 
