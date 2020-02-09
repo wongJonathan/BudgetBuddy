@@ -1,18 +1,23 @@
-import React, {ReactElement, useState, useRef, createRef, useEffect,} from "react";
-import MaterialTable from "material-table";
+import React, 
+{
+  ReactElement, 
+  useState, 
+  useEffect,
+} from 'react';
+import MaterialTable, {EditComponentProps} from 'material-table';
 import LensIcon from '@material-ui/icons/Lens';
 
-import {IExpenseTag} from "../../types";
-import ExpenseEntryTable from "./expenseEntryTable";
+import {ExpenseTag} from '../../types';
+import ExpenseEntryTable from './expenseEntryTable';
 import ColorPickerEditComponent from './colorPickerEditComponent';
 
-type handleEdit = (newTag: IExpenseTag, oldTag: IExpenseTag | undefined) => void;
+type handleEdit = (newTag: ExpenseTag, oldTag: ExpenseTag | undefined) => void;
 
-interface expenseTableProps {
-  data: IExpenseTag[];
-  handleCreate: (newTag: IExpenseTag) => void;
+interface ExpenseTableProps {
+  data: ExpenseTag[];
+  handleCreate: (newTag: ExpenseTag) => void;
   handleEdit: handleEdit;
-  handleDelete: (deletedTag: IExpenseTag) => void;
+  handleDelete: (deletedTag: ExpenseTag) => void;
 }
 
 /**
@@ -25,9 +30,9 @@ const ExpenseTable = (
     handleCreate,
     handleEdit,
     handleDelete
-  }: expenseTableProps
+  }: ExpenseTableProps
 ): ReactElement => {
-  const [tags, setTags] = useState<IExpenseTag[]>(data);
+  const [tags, setTags] = useState<ExpenseTag[]>(data);
 
   const updateTotal = (addValue: number, tagId: number): void => {
     const tagIndex = tags.findIndex((tag) => tag.id === tagId);
@@ -38,11 +43,19 @@ const ExpenseTable = (
     }
   };
 
-  const handleEntryEdit = (currentTag: IExpenseTag): ((newExpenseTag: IExpenseTag) => void) => {
-    return (newExpenseTag: IExpenseTag): void => {
+  const handleEntryEdit = (currentTag: ExpenseTag): ((newExpenseTag: ExpenseTag) => void) => {
+    return (newExpenseTag: ExpenseTag): void => {
       handleEdit(newExpenseTag, currentTag);
     };
   };
+
+  const labelRender = (rowData: ExpenseTag): ReactElement => (
+    <LensIcon style={{color: rowData.identifier}} />
+  );
+
+  const labelEdit = (props: EditComponentProps<ExpenseTag>): ReactElement => (
+    <ColorPickerEditComponent props={props} />
+  );
 
   useEffect(() => {
     setTags(data);
@@ -61,10 +74,8 @@ const ExpenseTable = (
           {
             title: 'Label',
             field: 'identifier',
-            render: rowData => (
-              <LensIcon style={{color: rowData.identifier}} />
-            ),
-            editComponent: props => <ColorPickerEditComponent props={props} />,
+            render: labelRender,
+            editComponent: labelEdit,
             cellStyle: {
               paddingLeft: 0,
               paddingRight: 0,
@@ -85,32 +96,32 @@ const ExpenseTable = (
         ]}
         data={tags}
         editable={{
-          onRowAdd: newTag =>
-            new Promise((resolve, reject) => {
+          onRowAdd: (newTag): Promise<void> =>
+            new Promise((resolve) => {
               handleCreate(newTag);
               resolve();
             }),
-          onRowUpdate: (newData, oldData) =>
-            new Promise((resolve, reject) => {
+          onRowUpdate: (newData, oldData): Promise<void> =>
+            new Promise((resolve) => {
               handleEdit(newData, oldData);
               resolve();
             }),
-          onRowDelete: oldData =>
-            new Promise((resolve, reject) => {
+          onRowDelete: (oldData): Promise<void> =>
+            new Promise((resolve) => {
               handleDelete(oldData);
               resolve();
             }),
           }
         }
         detailPanel={
-          rowData =>
+          (rowData): ReactElement =>
             <ExpenseEntryTable
               currentTag={rowData}
               handleEdit={handleEntryEdit(rowData)}
               updateTotal={updateTotal}
             />
         }
-        onRowClick={(event, rowData, togglePanel) => {
+        onRowClick={(event, rowData, togglePanel): void => {
           if(togglePanel) {
             togglePanel();
           }

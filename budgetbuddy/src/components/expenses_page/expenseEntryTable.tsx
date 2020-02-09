@@ -1,15 +1,15 @@
 import React, {ReactElement, useState} from "react";
-import MaterialTable from "material-table";
+import MaterialTable, {EditComponentProps} from "material-table";
 import {makeStyles, MenuItem, Select, TextField, Typography} from "@material-ui/core";
 import axios from 'axios';
 
 import {PayPeriod} from "../../enum";
-import {ExpenseEntry, IExpenseTag} from "../../types";
+import {ExpenseEntry, ExpenseTag} from "../../types";
 
 
-interface expenseEntryTableProps {
-  currentTag: IExpenseTag;
-  handleEdit: (newExpenseTag: IExpenseTag) => void;
+interface ExpenseEntryTableProps {
+  currentTag: ExpenseTag;
+  handleEdit: (newExpenseTag: ExpenseTag) => void;
   updateTotal: (addValue: number, tagId: number) => void;
 }
 
@@ -34,18 +34,18 @@ const createTag = (newExpense: ExpenseEntry, tagId: number): Promise<ExpenseEntr
 /**
  * Table that displays expense entries. Can create, edit, and delete entries.
  */
-const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTableProps): ReactElement => {
+const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: ExpenseEntryTableProps): ReactElement => {
   const classes = useStyle();
 
   const [expenses, setExpenses] = useState<ExpenseEntry[]>(currentTag.expenses || []);
 
-  const handleCreate = (newExpense: ExpenseEntry): Promise<any> => (
+  const handleCreate = (newExpense: ExpenseEntry): Promise<void> => (
     new Promise((resolve, reject) => {
-      if (!newExpense.hasOwnProperty('expenseName')) {
+      if (!('expenseName' in newExpense)) {
         newExpense.expenseName = '';
       }
 
-      if (!newExpense.hasOwnProperty('value')) {
+      if (!('value' in newExpense)) {
         newExpense.value = 0;
       }
 
@@ -55,7 +55,6 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTa
         console.log(response);
         if (response.status === 201) {
           setExpenses(prevState => [...prevState, response.data]);
-          // currentTag.total += response.data.value * response.data.payPeriodType;
           updateTotal(response.data.value * response.data.payPeriodType, currentTag.id);
           resolve();
         } else {
@@ -63,6 +62,41 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTa
         }
       });
     })
+  );
+
+  const handleCostEdit = (props: EditComponentProps<ExpenseEntry>): ReactElement => (
+    <TextField
+      inputProps={{ "aria-label": "cost-input" }}
+      aria-label="cost"
+      type="number"
+      value={props.value || ''}
+      onChange={(e): void => props.onChange(parseInt(e.target.value))}
+    />
+  );
+
+  const handlePayPeriodEdit = (props: EditComponentProps<ExpenseEntry>): ReactElement => {
+    const selectValue = props.value === undefined ? 1 : props.value;
+    return (
+      <Select
+        value={selectValue}
+        onChange={(e): void => props.onChange(e.target.value)}
+      >
+        {payPeriods.map(payPeriodValue => {
+          return (
+            <MenuItem
+              key={payPeriodValue}
+              value={PayPeriod[payPeriodValue as keyof typeof PayPeriod]}
+            >
+              {payPeriodValue}
+            </MenuItem>
+          )
+        })}
+      </Select>
+    );
+  };
+
+  const renderPayPeriodData = (rowData: ExpenseEntry): ReactElement => (
+    <Typography>{PayPeriod[rowData.payPeriodType]}</Typography>
   );
 
   return (
@@ -82,47 +116,21 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTa
             {
               title: 'Cost',
               field: 'value',
-              editComponent: props => (
-                <TextField
-                  type="number"
-                  value={props.value || ''}
-                  onChange={e => props.onChange(parseInt(e.target.value))}
-                />
-              )
+              editComponent: handleCostEdit,
             },
             {
               title: 'Pay Period',
               field: 'payPeriodType',
               initialEditValue: 1,
-              editComponent: props => {
-
-                const selectValue = props.value === undefined ? 1 : props.value;
-                return (
-                  <Select
-                    value={selectValue}
-                    onChange={e => props.onChange(e.target.value)}
-                  >
-                    {payPeriods.map(payPeriodValue => {
-                      return (
-                        <MenuItem
-                          key={payPeriodValue}
-                          value={PayPeriod[payPeriodValue as keyof typeof PayPeriod]}
-                        >
-                          {payPeriodValue}
-                        </MenuItem>
-                      )
-                    })}
-                  </Select>
-                )
-              },
-              render: rowData => <Typography>{PayPeriod[rowData.payPeriodType]}</Typography>
+              editComponent: handlePayPeriodEdit,
+              render: renderPayPeriodData,
             }
           ]}
           data={expenses}
           editable={{
             onRowAdd: handleCreate,
-            onRowUpdate: (newData, oldData) =>
-              new Promise((resolve, reject) => {
+            onRowUpdate: (newData, oldData): Promise<void> =>
+              new Promise((resolve) => {
                 if (oldData) {
                   const diffValue = newData.value * newData.payPeriodType - oldData.value * oldData.payPeriodType;
                   const index = currentTag.expenses.indexOf(oldData);
@@ -132,9 +140,8 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: expenseEntryTa
                 }
                 resolve();
               }),
-            onRowDelete: oldData => {
-              console.log('deletesd')
-              return new Promise((resolve, reject) => {
+            onRowDelete: (oldData): Promise<void> => {
+              return new Promise((resolve) => {
                 const index = currentTag.expenses.indexOf(oldData);
                 currentTag.expenses.splice(index, 1);
                 currentTag.total -= oldData.value * oldData.payPeriodType;

@@ -15,7 +15,7 @@ export default class Home extends React.Component<{}, IState> {
 
     handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ value: e.target.value });
-    }
+    };
 
     keyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.keyCode === 13) {
