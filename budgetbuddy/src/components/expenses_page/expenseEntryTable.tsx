@@ -55,7 +55,6 @@ const ExpenseEntryTable = ({currentTag, handleEdit, updateTotal}: ExpenseEntryTa
         console.log(response);
         if (response.status === 201) {
           setExpenses(prevState => [...prevState, response.data]);
-          // currentTag.total += response.data.value * response.data.payPeriodType;
           updateTotal(response.data.value * response.data.payPeriodType, currentTag.id);
           resolve();
         } else {
