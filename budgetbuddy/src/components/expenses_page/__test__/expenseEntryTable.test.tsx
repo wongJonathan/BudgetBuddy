@@ -2,8 +2,7 @@ import React from 'react';
 import {cleanup, fireEvent, render, wait} from '@testing-library/react';
 import axios from 'axios';
 
-import {EditComponentProps} from "material-table";
-import {ExpenseEntry, ExpenseTag} from "../../../types";
+import {ExpenseTag} from "../../../types";
 import expenseTag from "../mockTypes/expenseTag";
 import expenseEntry from "../mockTypes/expenseEntry";
 import ExpenseEntryTable from "../expenseEntryTable";
@@ -48,7 +47,7 @@ describe('Expense Entry Table', () => {
       })
     ));
 
-    const { getByPlaceholderText, getByText, getByLabelText, debug } = render(
+    const { getByPlaceholderText, getByText, getByLabelText } = render(
       <ExpenseEntryTable
         currentTag={mockTag}
         handleEdit={mockEdit}
@@ -103,7 +102,5 @@ describe('Expense Entry Table', () => {
 
   });
 
-  test('Should be able to delete an entry', () => {
-
-  });
+  test('Should be able to delete an entry', () => {});
 });

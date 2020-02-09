@@ -1,5 +1,5 @@
 import React from 'react';
-import {cleanup, fireEvent, render, wait} from '@testing-library/react';
+import {cleanup, fireEvent, render} from '@testing-library/react';
 import ColorPickerEditComponent from '../colorPickerEditComponent';
 import {EditComponentProps} from "material-table";
 import {ExpenseTag} from "../../../types";
